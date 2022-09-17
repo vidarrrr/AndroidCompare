@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Anime App</string>
+    <string name="fetch_anime_list">Fetch Anime List</string>
+    <string name="anime_image">Anime Image</string>
+</resources>

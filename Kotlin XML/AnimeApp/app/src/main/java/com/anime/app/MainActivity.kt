@@ -1,10 +1,8 @@
 package com.anime.app
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +32,16 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.adapter = animeQuoteAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         val repository = AnimeQuoteRepository()
-        val viewModelFactory = ViewModelFactory(repository)
+        val viewModelFactory = ViewModelFactory(repository){ error ->
+            error?.let {errorString ->
+                Toast.makeText(
+                    this@MainActivity,
+                    errorString,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
         viewModel = ViewModelProvider(this,viewModelFactory)[AnimeQuoteViewModel::class.java]
 
         viewModel.animeQuoteList.observe(this, Observer { result ->

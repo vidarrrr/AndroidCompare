@@ -1,7 +1,20 @@
+import 'dart:io';
+
 import 'package:anime_app_flutter/core/main_view.dart';
 import 'package:flutter/material.dart';
 
+//https://stackoverflow.com/questions/54285172/how-to-solve-flutter-certificate-verify-failed-error-while-performing-a-post-req
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 

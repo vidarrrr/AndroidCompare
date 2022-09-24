@@ -1,6 +1,5 @@
 package com.anime.app.recyclerview
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,17 +12,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.anime.app.R
 import com.anime.app.constants.Constants
 import com.anime.app.model.AnimeQuote
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 
-class AnimeQuoteAdapter(private val onClick: (AnimeQuote) -> Unit): ListAdapter<AnimeQuote,AnimeQuoteAdapter.AnimeQuoteViewModel>(AnimeQuoteDiffCallback) {
+class AnimeQuoteAdapter(private val onClick: (AnimeQuote) -> Unit) :
+    ListAdapter<AnimeQuote, AnimeQuoteAdapter.AnimeQuoteViewModel>(AnimeQuoteDiffCallback) {
 
 
-    inner class AnimeQuoteViewModel(itemView: View, val onClick: (AnimeQuote) -> Unit): RecyclerView.ViewHolder(itemView){
-        private val constraintLayout: ConstraintLayout = itemView.findViewById(R.id.anime_constraint_layout)
+    inner class AnimeQuoteViewModel(itemView: View, val onClick: (AnimeQuote) -> Unit) :
+        RecyclerView.ViewHolder(itemView) {
+        private val constraintLayout: ConstraintLayout =
+            itemView.findViewById(R.id.anime_constraint_layout)
         private val imageView: ImageView = itemView.findViewById(R.id.anime_image_view)
-        private val animeNameText : TextView = itemView.findViewById(R.id.anime_name_text_view)
+        private val animeNameText: TextView = itemView.findViewById(R.id.anime_name_text_view)
         private val animeDetailText: TextView = itemView.findViewById(R.id.anime_details_text_view)
         private var currentAnimeQuote: AnimeQuote? = null
+
         init {
             constraintLayout.setOnClickListener {
 
@@ -34,26 +37,28 @@ class AnimeQuoteAdapter(private val onClick: (AnimeQuote) -> Unit): ListAdapter<
             }
         }
 
-        fun bind(animeQuote: AnimeQuote){
+        fun bind(animeQuote: AnimeQuote) {
             loadImageURL(imageView, Constants.ANIME_IMG_URL)
             loadText(animeNameText, animeQuote.anime + "-" + animeQuote.character)
             loadText(animeDetailText, animeQuote.quote)
             currentAnimeQuote = animeQuote
         }
 
-        private fun loadImageURL(imageView: ImageView, url: String){
-            Picasso.get().load(url).into(imageView)
+        private fun loadImageURL(imageView: ImageView, url: String) {
+            //https://stackoverflow.com/questions/29363321/picasso-v-s-imageloader-v-s-fresco-vs-glide-vs-coil
+            //Picasso.get().load(url).into(imageView)
+            Glide.with(imageView.context).load(url).into(imageView)
         }
 
-        private fun loadText(textView: TextView, text: String){
+        private fun loadText(textView: TextView, text: String) {
             textView.text = text
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeQuoteViewModel {
         val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.anime_item_view,parent,false)
-        return AnimeQuoteViewModel(view,onClick)
+            .inflate(R.layout.anime_item_view, parent, false)
+        return AnimeQuoteViewModel(view, onClick)
     }
 
     override fun onBindViewHolder(holder: AnimeQuoteViewModel, position: Int) {
@@ -62,7 +67,7 @@ class AnimeQuoteAdapter(private val onClick: (AnimeQuote) -> Unit): ListAdapter<
     }
 }
 
-object AnimeQuoteDiffCallback : DiffUtil.ItemCallback<AnimeQuote>(){
+object AnimeQuoteDiffCallback : DiffUtil.ItemCallback<AnimeQuote>() {
     override fun areItemsTheSame(oldItem: AnimeQuote, newItem: AnimeQuote): Boolean {
         return oldItem == newItem
     }

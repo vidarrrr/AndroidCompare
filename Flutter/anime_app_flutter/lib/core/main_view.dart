@@ -16,6 +16,8 @@ class _MainViewState extends State<MainView> {
   List<AnimeQuoteModel>? _animeQuoteList;
   //bool _isLoading = false;
   late final IAnimeQuoteService _animeQuoteService;
+  final errorString = "error";
+  final empty = "Empty";
 
   @override
   void initState() {
@@ -25,13 +27,27 @@ class _MainViewState extends State<MainView> {
 
   Future<void> getAnimeQuotes() async {
     //_changeIsLoading();
-    final response = await _animeQuoteService
-        .getAnimeQuotes(); //DioService().getAnimeQuotes();
+    final response = await _animeQuoteService.getAnimeQuotes(
+      (error) {
+        toastError(error);
+      },
+    ); //DioService().getAnimeQuotes();
+
     if (response != null) {
       setState(() {
         _animeQuoteList = response; //.cast<AnimeQuoteModel>()
       });
     }
+  }
+
+  void toastError(String? error) {
+    Fluttertoast.showToast(
+      msg: error ?? errorString,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
+    );
   }
 
   @override
@@ -45,13 +61,16 @@ class _MainViewState extends State<MainView> {
               onPressed: () {
                 getAnimeQuotes();
               },
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(ButtonDetails.buttonColor)),
+              style: buildButtonStyle(),
               child: const Text(ButtonDetails.buttonText))
         ],
       ),
     );
+  }
+
+  ButtonStyle buildButtonStyle() {
+    return ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(ButtonDetails.buttonColor));
   }
 
   Expanded buildList() {
@@ -64,40 +83,46 @@ class _MainViewState extends State<MainView> {
               decoration: buildBoxDecoration(),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.network(
-                    Constants.animeImageUrl,
-                    height: ImageSize.size,
-                    width: ImageSize.size,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Fluttertoast.showToast(
-                        msg: _animeQuoteList?[index].quote ?? "Empty",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        backgroundColor: Colors.white,
-                        textColor: Colors.black,
-                      );
-                    },
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width - 120,
-                      child: Column(
-                        children: [
-                          buildText(
-                              _animeQuoteList?[index].anime ?? "", index, 1),
-                          buildText(_animeQuoteList?[index].character ?? "",
-                              index, 1),
-                          buildText(
-                              _animeQuoteList?[index].quote ?? "", index, 2),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
+                children: [buildImage(), buildGestureDetector(index, context)],
               ),
             ));
           }),
+    );
+  }
+
+  GestureDetector buildGestureDetector(int index, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        toast(index);
+      },
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 120,
+        child: Column(
+          children: [
+            buildText(_animeQuoteList?[index].anime ?? "", index, 1),
+            buildText(_animeQuoteList?[index].character ?? "", index, 1),
+            buildText(_animeQuoteList?[index].quote ?? "", index, 2),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Image buildImage() {
+    return Image.network(
+      Constants.animeImageUrl,
+      height: ImageSize.size,
+      width: ImageSize.size,
+    );
+  }
+
+  void toast(int index) {
+    Fluttertoast.showToast(
+      msg: _animeQuoteList?[index].quote ?? empty,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
     );
   }
 

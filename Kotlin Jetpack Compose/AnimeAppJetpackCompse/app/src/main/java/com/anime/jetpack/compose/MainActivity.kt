@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.anime.app.viewmodel.AnimeQuoteViewModel
+import com.anime.jetpack.compose.viewmodel.AnimeQuoteViewModel
 import com.anime.jetpack.compose.constants.Constants
 import com.anime.jetpack.compose.model.AnimeQuote
 import com.anime.jetpack.compose.repository.AnimeQuoteRepository
@@ -38,27 +38,14 @@ import com.anime.jetpack.compose.viewmodel.ViewModelFactory
 import com.skydoves.landscapist.glide.GlideImage
 
 class MainActivity : ComponentActivity() {
-    //private lateinit var viewModel: AnimeQuoteViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 
-        //val repository = AnimeQuoteRepository()
-        //val viewModelFactory = ViewModelFactory(repository)
-        //viewModel = ViewModelProvider(this, viewModelFactory).get(AnimeQuoteViewModel::class.java)
-        //viewModel.getTenAnimeQuotes()
 
-//        viewModel.animeQuoteList.observe(this, Observer { result ->
-//            result.body()?.let {animeQuotes ->
-//
-//                animeQuoteAdapter.submitList(animeQuotes)
-//            }
-//
-//        })
-//        binding.fetchResourcesButton.setOnClickListener {
-//            viewModel.getTenAnimeQuotes()
-//        }
-        val buttonName  = "Fetch Anime Quotes"
+        val buttonName = "Fetch Anime Quotes"
+        val viewModelKey = "AnimeQuoteViewModel"
         setContent {
             AnimeAppJetpackCompseTheme {
                 // A surface container using the 'background' color from the theme
@@ -69,13 +56,20 @@ class MainActivity : ComponentActivity() {
                     val owner = LocalViewModelStoreOwner.current
                     owner?.let {
                         val viewModel: AnimeQuoteViewModel =
-                            viewModel(it, "AnimeQuoteViewModel", ViewModelFactory(AnimeQuoteRepository()))
+                            viewModel(
+                                it,
+                                viewModelKey,
+                                ViewModelFactory(AnimeQuoteRepository()) { error ->
+                                    //https://stackoverflow.com/questions/70324983/get-context-in-a-jetpack-compose-noncomposable-function
+                                    printMessage(applicationContext, error)
+
+                                })
                         //viewModel.getTenAnimeQuotes()
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(16.dp),
-                            verticalArrangement = Arrangement.Center,
+                            verticalArrangement = Arrangement.Top,
                             horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
@@ -89,6 +83,7 @@ class MainActivity : ComponentActivity() {
 //                                    "Dattebayo"
 //                                )
 //                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                             FetchResourceButton(viewModel = viewModel, name = buttonName)
                         }
                     }
@@ -103,13 +98,31 @@ class MainActivity : ComponentActivity() {
 //    Text(text = "Hello $name!")
 //}
 
+
+fun printMessage(context: Context, message: String?) {
+    message?.let {
+        Toast.makeText(
+            context,
+            it,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+}
+
 @Composable
 fun FetchResourceButton(viewModel: AnimeQuoteViewModel, name: String) {
-    Button(onClick = {
-        viewModel.getTenAnimeQuotes()
-    }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff6DB0FF))
+    Button(
+        onClick = {
+            viewModel.getTenAnimeQuotes()
+        }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff6DB0FF)),
+        shape = RoundedCornerShape(100.dp),
+        modifier = Modifier
+            .height(48.dp)
+            .width(260.dp)
+
+
     ) {
-        Text(name)
+        Text(name, color = Color(0xffffffff))
     }
 }
 
@@ -131,7 +144,7 @@ fun AnimeQuoteList(context: Context, animeQuote: AnimeQuote) {
                 .height(84.dp),
             contentScale = ContentScale.Crop,
 
-        )
+            )
         Row {
             AnimeQuoteImage(Constants.ANIME_IMG_URL)
             Column(
@@ -141,13 +154,14 @@ fun AnimeQuoteList(context: Context, animeQuote: AnimeQuote) {
                     .align(Alignment.CenterVertically)
                     .clickable(
                         onClick = {
-                            Toast
-                                .makeText(
-                                    context,
-                                    animeQuote.character + "-" + animeQuote.quote,
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
+                            printMessage(context, animeQuote.character + "-" + animeQuote.quote)
+//                            Toast
+//                                .makeText(
+//                                    context,
+//                                    animeQuote.character + "-" + animeQuote.quote,
+//                                    Toast.LENGTH_SHORT
+//                                )
+//                                .show()
                         }
                     )
             ) {
@@ -157,7 +171,12 @@ fun AnimeQuoteList(context: Context, animeQuote: AnimeQuote) {
                     overflow = TextOverflow.Ellipsis,
                     color = Color(0xFFFFAA00)
                 )
-                Text(text = animeQuote.quote, maxLines = 2, overflow = TextOverflow.Ellipsis, color = Color(0xFFFFAA00))
+                Text(
+                    text = animeQuote.quote,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color(0xFFFFAA00)
+                )
             }
         }
 
@@ -200,7 +219,7 @@ fun AnimeQuoteLazyColumn(
     //Log.d("animeQuoteSize", animeQuotes.toString())
     LazyColumn(
         modifier = Modifier
-            .fillMaxHeight(0.7f)
+            .fillMaxHeight(0.8f)
 
     ) {
         //Log.d("animeQuotes", animeQuotes?.body()?.size.toString())

@@ -3,16 +3,16 @@ Kotlin XML vs Kotlin Jetpack Compose vs Flutter
 
 # Release APK Sizes
 ```
-Kotlin XML -> 4.59MB
-Kotlin Jetpack Compose -> 4.85MB
-Flutter -> 17.48MB
+Kotlin XML -> 4.59MB (old) -> 4.67MB
+Kotlin Jetpack Compose -> 4.85MB (old) -> 4.73MB
+Flutter -> 17.48MB (old) -> 17.7MB
 ```
 
 # After installation
 ```
-Kotlin XML apk size -> 26.09MB
-Kotlin Jetpack Compose apk size -> 36.36MB
-Flutter apk size -> 29.43MB
+Kotlin XML apk size -> 26.09MB (old) -> 27.37MB
+Kotlin Jetpack Compose apk size -> 36.36MB (old) -> 36.32MB
+Flutter apk size -> 29.43MB (old) -> 30.61MB
 ```
 
 # Speed Test
@@ -56,10 +56,11 @@ CPU   VSS       RSS
 
 > Command : adb shell top | grep anime
 
-> Flutter 2.10.4 Dart 2.16.2  DevTools 2.9.2
+> Flutter 3.3.2 Dart 2.18.1 DevTools 2.15.0  (old Flutter 2.10.4 Dart 2.16.2  DevTools 2.9.2)
 
-> Kotlin 1.7.10
+> Kotlin 1.7.10 (new version uses Glide) (old version used Picasso)
 
 > Kotlin 1.7.10 Compose Version = 1.3.0-beta01
+
 
 **These tests are based on Android 6 Device**
